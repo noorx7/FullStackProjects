@@ -8,7 +8,8 @@ const User = require("./models/User")
 require("dotenv").config()
 app.use(express.json())
 const bcryptsalt = bcrypt.genSaltSync(10)
-
+const jwtSecret = 'SUI'
+const jwt = require("jsonwebtoken")
 
 app.use(cors({
     credentials: true,
@@ -17,6 +18,8 @@ app.use(cors({
 
 
 mongoose.connect(process.env.MONGO_URL)
+
+mongoose.set('strictQuery', false);
 
 app.get("/test", (req, res) => {
     res.json("test ok")
@@ -39,5 +42,31 @@ app.post("/register", async (req, res) => {
 
 
 })
+
+
+app.post("/login", async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        userDoc = await User.findOne({ email })
+        if (userDoc) {
+            const passOk = bcrypt.compareSync(password, userDoc.password)
+            if (passOk) {
+                jwt.sign({ email: userDoc.email, id: userDoc._id }, jwtSecret, {}, (err, token) => { res.cookie("token", token).json('pass ok') })
+
+
+            } else {
+                res.status(422).json("pass not ok")
+            }
+        } else {
+            res.json("not found")
+        }
+    } catch (e) {
+        res.status(422).json(e)
+    }
+
+
+})
+
+
 
 app.listen(4000);
