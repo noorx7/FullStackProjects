@@ -10,17 +10,24 @@ function LoginPage() {
 	const { setUser } = useContext(UserContext);
 	async function handleLoginSubmit(ev) {
 		ev.preventDefault();
+		if (!email || !password) {
+			alert("Please enter both email and password");
+			return;
+		}
 		try {
 			const { data } = await axios.post("/login", {
 				email,
 				password,
 			});
 			setUser(data);
-			alert("Login Successful. Now you can log in");
-
+			alert("Login successful");
 			setRedirect(true);
 		} catch (e) {
-			alert("Login failed. Please try again later");
+			if (e.response && e.response.status === 422) {
+				alert("Password is wrong");
+			} else {
+				alert("Login failed. Please try again later.");
+			}
 		}
 	}
 
