@@ -2,12 +2,12 @@ import { Link, useParams } from "react-router-dom";
 import { useState } from "react";
 import Perks from "../Perks";
 import axios from "axios";
+import PhotosUploader from "../PhotosUploader.jsx";
 function PlacesPage(props) {
 	const { action } = useParams();
 	const [title, setTitle] = useState("");
 	const [address, setAddress] = useState("");
 	const [addedPhotos, setAddedPhotos] = useState([]);
-	const [photoLink, setPhotoLink] = useState("");
 	const [description, setDescription] = useState("");
 	const [perks, setPerks] = useState([]);
 	const [extraInfo, setExtraInfo] = useState("");
@@ -29,34 +29,7 @@ function PlacesPage(props) {
 			</>
 		);
 	}
-	async function addPhotoByLink(ev) {
-		ev.preventDefault();
-		const { data: filename } = await axios.post("/upload-by-link", {
-			link: photoLink,
-		});
-		setAddedPhotos((prev) => {
-			return [...prev, filename];
-		});
-		setPhotoLink("");
-	}
 
-	function uploadPhoto(ev) {
-		const files = ev.target.files;
-		const data = new FormData();
-		for (let i = 0; i < files.length; i++) {
-			data.append("photos", files[i]);
-		}
-		axios
-			.post("/upload", data, {
-				headers: { "Content-type": "multipart/form-data" },
-			})
-			.then((response) => {
-				const { data: filenames } = response;
-				setAddedPhotos((prev) => {
-					return [...prev, ...filenames];
-				});
-			});
-	}
 	return (
 		props.page === "places" && (
 			<div>
@@ -70,7 +43,7 @@ function PlacesPage(props) {
 								xmlns="http://www.w3.org/2000/svg"
 								viewBox="0 0 20 20"
 								fill="currentColor"
-								class="w-5 h-5"
+								className="w-5 h-5"
 							>
 								<path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
 							</svg>
@@ -105,57 +78,11 @@ function PlacesPage(props) {
 							"Photos",
 							"Upload quality realistic pictures for your soon to be Airbnb! Remember the more the better."
 						)}
+						<PhotosUploader
+							addedPhotos={addedPhotos}
+							onChange={setAddedPhotos}
+						/>
 
-						<div className="flex gap-2">
-							<input
-								type="text"
-								value={photoLink}
-								onChange={(ev) => setPhotoLink(ev.target.value)}
-								placeholder="Add using a link"
-							/>
-							<button
-								onClick={addPhotoByLink}
-								className="bg-gray-200 px-4 rounded-2xl "
-							>
-								Add&nbsp;photo
-							</button>
-						</div>
-
-						<div className="mt-3 grid gap-2 grid-cols-3 lg:grid-cols-6 md:grid-cols-4">
-							{addedPhotos.length > 0 &&
-								addedPhotos.map((link) => (
-									<div className="h-32 flex">
-										<img
-											className="rounded-2xl w-full object-cover"
-											src={"http://localhost:4000/uploads/" + link}
-											alt=""
-										/>
-									</div>
-								))}
-							<label className="h-32	cursor-pointer flex gap-1 justify-center items-center 	border bg-transparent rounded-2xl p-2 text-xl text-gray-600">
-								<input
-									type="file"
-									multiple
-									className="hidden"
-									onChange={uploadPhoto}
-								/>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke-width="1.5"
-									stroke="currentColor"
-									class="w-5 h-5"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
-									/>
-								</svg>
-								Upload
-							</label>
-						</div>
 						{preInput("Description", "A little story about your place!")}
 						<textarea
 							value={description}
