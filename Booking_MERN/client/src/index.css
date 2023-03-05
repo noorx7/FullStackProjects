@@ -8,6 +8,10 @@ input[type="text"],input[type="password"],input[type="email"],input[type="number
     
 }
 
+textarea{
+    height:140px;
+}
+
 button{
     @apply bg-gray-300
 }
