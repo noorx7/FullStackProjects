@@ -36,8 +36,14 @@ function PlacesPage(props) {
 								to={"/account/places/" + place._id}
 								className="flex cursor-pointer gap-4 bg-gray-100 rounded-2xl p-4 "
 							>
-								<div className="w-32 h-32 bg-gray-300">
-									{place.photos.length && <img src={place.photos[0]} alt="" />}
+								<div className="flex w-32 h-32 bg-gray-300">
+									{place.photos.length && (
+										<img
+											className="object-cover"
+											src={"http://localhost:4000/uploads/" + place.photos[0]}
+											alt=""
+										/>
+									)}
 								</div>
 								<div className="">
 									<h2 className="text-xl">{place.title}</h2>
