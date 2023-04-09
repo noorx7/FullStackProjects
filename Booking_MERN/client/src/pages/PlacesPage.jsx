@@ -16,7 +16,7 @@ function PlacesPage(props) {
 
 			<div className="text-center">
 				<Link
-					className="items-center inline-flex gap-2  bg-primary  text-white py-2 px-6 rounded-full"
+					className="items-center inline-flex gap-1  bg-primary  text-white py-2 px-6 rounded-full"
 					to={"/account/places/new"}
 				>
 					<svg
@@ -36,7 +36,7 @@ function PlacesPage(props) {
 								to={"/account/places/" + place._id}
 								className="flex cursor-pointer gap-4 bg-gray-100 rounded-2xl p-4 "
 							>
-								<div className="flex w-32 h-32 bg-gray-300">
+								<div className="flex w-32 h-32 bg-gray-300 grow shrink-0 ">
 									{place.photos.length && (
 										<img
 											className="object-cover"
