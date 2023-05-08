@@ -6,6 +6,7 @@ const mongoose = require("mongoose")
 const bcrypt = require("bcryptjs")
 const User = require("./models/User")
 const Place = require("./models/Place")
+const Booking = require("./models/Booking")
 require("dotenv").config()
 const bcryptsalt = bcrypt.genSaltSync(10)
 const jwtSecret = 'SUI'
@@ -23,6 +24,16 @@ app.use(express.json())
 app.use(cookieParser())
 app.use('/uploads', express.static(__dirname + '/uploads'))
 mongoose.connect(process.env.MONGO_URL)
+
+function getUserDataFromReq(req) {
+    return new Promise((resolve, reject) => {
+        jwt.verify(req.cookies.token, jwtSecret, {}, async (err, userData) => {
+            if (err) throw err;
+            resolve(userData);
+        })
+    })
+
+}
 
 mongoose.set('strictQuery', false);
 
@@ -162,6 +173,42 @@ app.put("/places", async (req, res) => {
 
 app.get('/places', async (req, res) => {
     res.json(await Place.find())
+})
+
+app.post('/booking', async (req, res) => {
+    const userData = await getUserDataFromReq(req)
+
+    const {
+        place,
+        checkIn,
+        checkOut,
+        numberofGuests,
+        name,
+        phone,
+        price } = req.body
+    Booking.create({
+        place,
+        checkIn,
+        checkOut,
+        numberofGuests,
+        name,
+        phone,
+        price,
+        user: userData.id,
+    }).then((doc) => {
+        res.json(doc)
+    }).catch((err) => {
+        throw err;
+    })
+
+
+})
+
+
+
+app.get('/bookings', async (req, res) => {
+    const userData = await getUserDataFromReq(req);
+    res.json(await Booking.find({ user: userData.id }).populate('place'))
 })
 
 app.listen(4000);
